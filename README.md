@@ -107,18 +107,45 @@ This project is provided for **educational and authorized security testing purpo
 
 ### Prohibited Use
 - Intercepting nRF24 communications on devices you don't own
-- Injecting or replaying captured packets without authorization
+- Injecting or replaying captured packets without authorization (this repo never emits radio)
+- Using CRC-validated PDUs to sniff HID keystrokes outside an authorized lab scope
 - Any activity that violates applicable laws or regulations
 - Commercial use without proper licensing
 
-### No Warranty
-This software is provided "AS IS" without warranty of any kind. The author is not responsible for any misuse or damage caused by this software.
+### Regulatory Framework (Passive 2.4GHz)
+- **Federal Communications Act (47 U.S.C. § 333)**: Willful interference with authorized radio communications is prohibited.
+- **47 CFR Part 15**: 2.4GHz ISM band devices are intentional radiators; this repo is purely byte-level and emits nothing. Any lab capture requires an authorized, shield-attenuated bench.
+- **CFAA / ECPA / Wiretap Act / 18 U.S.C. §§ 2510-2522**: Interception of nRF24/BLE HID traffic without authorization is a federal offense.
+- **GDPR/CCPA**: HID payloads and address metadata may constitute personal data.
 
-### Responsible Disclosure
-If you discover vulnerabilities using this tool, follow responsible disclosure practices:
-1. Report to the device vendor/owner privately
-2. Allow reasonable time for remediation
-3. Do not exploit beyond proof of concept
+## Live Lab Test Plan
+
+Offline (this repo, no radio):
+1. `python3 firmware/nrf_observer.py` — parse the 20-PDU deterministic synthetic fixture and
+   render HID decodes + channel histogram (exit 0).
+2. `python3 firmware/nrf_observer.py --gen-fixture reports/esb.pcap`
+   `python3 firmware/nrf_observer.py --pcap reports/esb.pcap --json reports/w5.json`
+   — round-trip and ingest the fixture (exit 0).
+3. `python3 -m unittest discover -s tests` — byte-exact CRC-8/16 + round-trip tests pass (exit 0).
+
+Authorized lab (passive only, written scope, shield/de-energized devices):
+4. Stand an nRF24 capture dongle on a known authorized channel against devices you own; feed the
+   captured ESB PDUs into this parser and confirm CRC-valid frames match expected address/len/PID.
+5. Verify HID decode against one of your own keyboards; do not capture third-party devices.
+6. `green = permitted`: passive, unamplified observation on channels/lab you own; no transmission.
+
+## Metrics
+
+- ESB PDU parse pipeline (byte-exact): address (5B) -> control (len/PID/NO_ACK) -> payload -> CRC
+- CRC-8 (poly 0x07, init 0xFF) and CRC-16 (CCITT-FALSE 0x1021, init 0xFFFF) validation; CRC-bits auto-detect
+- HID decode: report ID, 8-bit modifier map, HID keycode->char table (qwerty)
+- Vendor OUI map over 5-byte ESB address prefixes; protocol ID via preamble (CrazyRadio PA / Logitech Unifying)
+- Channel-occupancy histogram (2..82 even); deterministic 20-PDU synthetic fixture
+- pcap classic ingest/generate; captures/ and reports/ gitignored
+- Offline: PDUs built as bytes with the in-repo CRC engine; no wall-clock data in the analysis path
+
+- Test suite: `python3 -m unittest discover -s tests`
+- Reports: `reports/` (gitignored)
 
 ## License
 
