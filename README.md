@@ -1,3 +1,9 @@
+> **⚠️ EDUCATIONAL USE ONLY — AUTHORIZED TESTING ONLY.**
+> This project exists for education, research, and **defense of systems you own
+> or hold explicit written authorization to assess**. Unauthorized use is
+> prohibited and may be illegal. Read [ETHICS.md](ETHICS.md) and
+> [SCOPE.md](SCOPE.md) before use. Use at your own risk; **AS IS**, no warranty.
+
 # W5 — nRF24 Cross-Protocol Observer
 
 Analysis suite for nRF24L01+ 2.4 GHz observation: ESB parsing, protocol decoding, channel-occupancy histograms, and MouseJack HID decodes.
