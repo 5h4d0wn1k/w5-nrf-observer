@@ -6,6 +6,9 @@
 
 # W5 — nRF24 Cross-Protocol Observer
 
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
+
 Analysis suite for nRF24L01+ 2.4 GHz observation: ESB parsing, protocol decoding, channel-occupancy histograms, and MouseJack HID decodes.
 
 ## Overview
@@ -30,16 +33,20 @@ This project implements a standalone nRF24L01+ observation and analysis tool:
 
 ```bash
 # No external dependencies required — pure Python stdlib
-python3 nrf_observer.py
+python3 firmware/nrf_observer.py
 ```
 
 ## Usage
 
 ```bash
 # Run full analysis demo (offline, embedded data)
-python3 nrf_observer.py
+python3 firmware/nrf_observer.py
 
-# Programmatic usage
+# Generate a deterministic ESB fixture pcap, then analyze it
+python3 firmware/nrf_observer.py --gen-fixture reports/esb.pcap
+python3 firmware/nrf_observer.py --pcap reports/esb.pcap --json reports/w5.json
+
+# Programmatic usage (modules live under firmware/)
 from nrf_observer import NRF24Observer, parse_esb_pdu, decode_mousejack_payload
 
 observer = NRF24Observer()
@@ -156,3 +163,13 @@ Authorized lab (passive only, written scope, shield/de-energized devices):
 ## License
 
 MIT
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+Report security issues via [SECURITY.md](SECURITY.md).
+
+## Documentation
+
+- [ETHICS.md](ETHICS.md) — usage policy
+- [SCOPE.md](SCOPE.md) — authorized testing scope
